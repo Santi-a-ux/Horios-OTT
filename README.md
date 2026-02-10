@@ -18,6 +18,7 @@ pip install -r requirements.txt
 cp .env.example .env
 
 ### 4.
+```bash
 # Database - Supabase (pooler)
 DATABASE_URL=postgresql://postgres.whjovldnkmxkmtsrncop:I7KJlgIGvTYviZIY@aws-0-us-west-2.pooler.supabase.com:5432/postgres
 
@@ -32,6 +33,7 @@ MUX_TOKEN_SECRET=tuPowCfY1RbmqfFSq/loFXGR7a7fire+IKNyiVP2T+rrNMjowVFpf/4nh4qDQuS
 
 # API
 API_BASE_URL=http://localhost:8000
+```
 
 ### 5. Correr servidor
 python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
