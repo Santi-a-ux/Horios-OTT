@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Horios OTT Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .panel { border: 1px solid #ddd; padding: 12px; border-radius: 8px; }
+    .list { max-width: 420px; width: 100%; }
+    .player { flex: 1 1 420px; }
+    .video-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; }
+    .video-item:hover { background: #f7f7f7; }
+    .muted { color: #666; font-size: 12px; }
+    input { width: 100%; padding: 8px; margin-top: 6px; }
+    button { margin-top: 8px; padding: 8px 12px; }
+    video { width: 100%; max-height: 360px; background: #000; }
+  </style>
+</head>
+<body>
+  <h2>Horios OTT Demo</h2>
+  <div class="panel">
+    <label for="token">Token (Bearer)</label>
+    <input id="token" placeholder="eyJhbGciOi..." />
+    <button id="load">Load videos</button>
+    <div class="muted">Tip: pega solo el token, sin la palabra "Bearer".</div>
+  </div>
+
+  <div class="row" style="margin-top: 16px;">
+    <div class="panel list">
+      <h3>Catalog</h3>
+      <div id="videos"></div>
+    </div>
+    <div class="panel player">
+      <h3>Player</h3>
+      <video id="player" controls></video>
+      <div id="status" class="muted"></div>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = 'http://127.0.0.1:8000';
+    const videosEl = document.getElementById('videos');
+    const statusEl = document.getElementById('status');
+    const player = document.getElementById('player');
+    let hls;
+
+    function setStatus(text) {
+      statusEl.textContent = text;
+    }
+
+    async function loadVideos() {
+      videosEl.innerHTML = '';
+      setStatus('');
+      const token = document.getElementById('token').value.trim();
+      if (!token) {
+        setStatus('Token requerido');
+        return;
+      }
+      const res = await fetch(`${apiBase}/videos`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        setStatus(`Error: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      if (!data.length) {
+        videosEl.innerHTML = '<div class="muted">No videos</div>';
+        return;
+      }
+      data.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'video-item';
+        div.textContent = `${v.title} ${v.is_premium ? '(premium)' : ''}`;
+        div.onclick = () => playVideo(v.id, token);
+        videosEl.appendChild(div);
+      });
+    }
+
+    async function playVideo(id, token) {
+      setStatus('Loading...');
+      const res = await fetch(`${apiBase}/videos/${id}/play`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        setStatus(`Error: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      if (data.status !== 'ready') {
+        setStatus(`Status: ${data.status} (wait a bit)`);
+        return;
+      }
+      const url = data.playback_url;
+      if (Hls.isSupported()) {
+        if (hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(player);
+      } else {
+        player.src = url;
+      }
+      setStatus('Playing');
+    }
+
+    document.getElementById('load').addEventListener('click', loadVideos);
+  </script>
+</body>
+</html>
