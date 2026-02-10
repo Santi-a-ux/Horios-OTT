@@ -45,13 +45,6 @@ migrations/         # SQL migrations
 main.py            # FastAPI app
 ```
 
-## Endpoints (Día 1 - base)
-
-- `GET /health` - Health check
-- `GET /` - Root
-
-(Se agregan más en días siguientes)
-
 ## Tecnología
 
 - **Backend**: FastAPI
