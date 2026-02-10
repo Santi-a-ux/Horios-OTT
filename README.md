@@ -6,30 +6,37 @@ OTT (Over-The-Top) streaming platform con FastAPI, PostgreSQL y Mux.
 
 ### 1. Variables de entorno
 ```bash
-cp .env.example .env
-# Edita .env con tus credenciales
+python -m venv .venv
+source .venv/bin/activate
 ```
 
 ### 2. Instalar dependencias
 ```bash
 pip install -r requirements.txt
 ```
+### 3. 
+cp .env.example .env
 
-### 3. Crear tablas en Postgres
-Ejecuta el SQL en `migrations/001_initial_schema.sql` en tu DB (Supabase, Neon, etc)
+### 4.
+# Database - Supabase (pooler)
+DATABASE_URL=postgresql://postgres.whjovldnkmxkmtsrncop:I7KJlgIGvTYviZIY@aws-0-us-west-2.pooler.supabase.com:5432/postgres
 
-O usa:
-```bash
-./run_migrations.sh  # Linux/Mac
-psql $DATABASE_URL -f migrations/001_initial_schema.sql  # Windows
-```
+# JWT - Genera una secret segura en producción
+JWT_SECRET=your-super-secret-key-min-32-chars-here-change-me
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=360
 
-### 4. Correr servidor
-```bash
-uvicorn main:app --reload
-```
+# Mux - Credentials
+MUX_TOKEN_ID=1bcd0f5a-78a2-4944-90e3-d6a8a70fbd38
+MUX_TOKEN_SECRET=tuPowCfY1RbmqfFSq/loFXGR7a7fire+IKNyiVP2T+rrNMjowVFpf/4nh4qDQuS/nNdTjmA/1oH
 
-Visita: http://localhost:8000/docs
+# API
+API_BASE_URL=http://localhost:8000
+
+### 5. Correr servidor
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+### 6. Visita: http://localhost:8000/docs
 
 ## Estructura
 
