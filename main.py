@@ -5,6 +5,7 @@ from pathlib import Path
 from app.db.database import Base, engine
 from app.db.models import User, Video
 from app.auth.router import router as auth_router
+from app.admin.router import router as admin_router
 from app.videos.router import router as videos_router
 
 # Create app
@@ -29,6 +30,7 @@ app.add_middleware(
 
 # Routers
 app.include_router(auth_router)
+app.include_router(admin_router)
 app.include_router(videos_router)
 
 
@@ -44,3 +46,11 @@ def root():
     if web_path.exists():
         return FileResponse(web_path)
     return {"message": "Horios OTT API"}
+
+
+@app.get("/login")
+def login_page():
+    web_path = Path(__file__).parent / "web" / "login.html"
+    if web_path.exists():
+        return FileResponse(web_path)
+    return {"message": "Login page not found"}

@@ -6,41 +6,176 @@
   <title>Horios OTT Demo</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .row { display: flex; gap: 16px; flex-wrap: wrap; }
-    .panel { border: 1px solid #ddd; padding: 12px; border-radius: 8px; }
-    .list { max-width: 420px; width: 100%; }
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=DM+Sans:wght@400;600&display=swap');
+    :root {
+      --bg: #0b0f1a;
+      --panel: #131826;
+      --panel-2: #0f1422;
+      --text: #e6edf6;
+      --muted: #9aa6b2;
+      --line: #242b3a;
+      --accent-1: #7aa8ff;
+      --accent-2: #9a86ff;
+      --accent-3: #65d1c8;
+      --shadow-sm: 0 10px 26px rgba(8, 10, 16, 0.55);
+      --shadow-md: 0 18px 40px rgba(8, 10, 16, 0.6);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(700px 320px at 10% -10%, rgba(122, 168, 255, 0.18), transparent 60%),
+        radial-gradient(620px 260px at 90% -10%, rgba(154, 134, 255, 0.14), transparent 60%),
+        radial-gradient(520px 220px at 50% 120%, rgba(101, 209, 200, 0.12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      padding: 32px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .row { display: flex; gap: 20px; flex-wrap: wrap; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(19, 24, 38, 0.75);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(6px);
+    }
+    .topbar h2 {
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      margin: 0;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .auth-actions { display: flex; align-items: center; gap: 12px; }
+    .auth-actions a { text-decoration: none; color: var(--text); opacity: 0.8; }
+    .auth-actions a:hover { opacity: 1; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 18px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
+    }
+    .panel h3 {
+      color: var(--text);
+      font-weight: 600;
+      margin-top: 0;
+      letter-spacing: 0.2px;
+    }
+    .panel .muted { color: var(--muted); }
+    .list { max-width: none; width: 100%; }
     .player { flex: 1 1 420px; }
-    .video-item { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; }
-    .video-item:hover { background: #f7f7f7; }
-    .muted { color: #666; font-size: 12px; }
-    input { width: 100%; padding: 8px; margin-top: 6px; }
-    button { margin-top: 8px; padding: 8px 12px; }
-    video { width: 100%; max-height: 360px; background: #000; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+    .video-card {
+      border: 1px solid var(--line);
+      padding: 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: left;
+      background: var(--panel-2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .video-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(122, 168, 255, 0.5);
+      box-shadow: 0 16px 28px rgba(8, 10, 16, 0.55);
+    }
+    .video-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; border: 1px solid #1f2635; }
+    .video-card .title {
+      margin-top: 10px;
+      font-weight: 600;
+      color: #e6edf6;
+      line-height: 1.25;
+    }
+    .muted { color: var(--muted); font-size: 12px; }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      background: #0f1422;
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 12px;
+    }
+    button {
+      margin-top: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      border: none;
+      border-radius: 999px;
+      color: #0b0f1a;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 12px 20px rgba(122, 168, 255, 0.35);
+    }
+    button:hover { filter: brightness(1.05); }
+    video { width: 100%; max-height: 360px; background: #0b0f1a; border-radius: 14px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--line); }
+    th { color: var(--text); font-weight: 600; }
+    .role-tag { font-size: 12px; color: var(--text); padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; background: #0f1422; }
+    .fade-in { animation: fadeUp 0.6s ease both; }
+    .video-card:nth-child(1) { animation-delay: 0.02s; }
+    .video-card:nth-child(2) { animation-delay: 0.04s; }
+    .video-card:nth-child(3) { animation-delay: 0.06s; }
+    .video-card:nth-child(4) { animation-delay: 0.08s; }
+    .video-card:nth-child(5) { animation-delay: 0.10s; }
+    .video-card:nth-child(6) { animation-delay: 0.12s; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .admin-panel { display: none; }
   </style>
 </head>
 <body>
-  <h2>Horios OTT Demo</h2>
-  <div class="panel">
-    <div><strong>Login</strong></div>
-    <label for="email">Email</label>
-    <input id="email" placeholder="user@example.com" />
-    <label for="password">Password</label>
-    <input id="password" type="password" placeholder="password123" />
-    <button id="login">Login</button>
-    <button id="logout">Logout</button>
-    <div id="auth" class="muted"></div>
-  </div>
-
-  <div class="row" style="margin-top: 16px;">
-    <div class="panel list">
-      <h3>Catalog</h3>
-      <div id="videos"></div>
+  <div class="container fade-in">
+    <div class="topbar">
+      <h2>Horios OTT</h2>
+      <div class="auth-actions">
+        <span id="auth" class="muted"></span>
+        <a id="login_link" href="/login">Login / Register</a>
+        <button id="logout">Logout</button>
+      </div>
     </div>
-    <div class="panel player">
-      <h3>Player</h3>
-      <video id="player" controls></video>
-      <div id="status" class="muted"></div>
+
+    <div class="row" style="margin-top: 16px;">
+      <div class="panel list fade-in">
+        <h3>Catalog</h3>
+        <div id="videos" class="grid"></div>
+      </div>
+      <div class="panel player fade-in">
+        <h3>Player</h3>
+        <video id="player" controls></video>
+        <div id="status" class="muted"></div>
+      </div>
+    </div>
+
+    <div class="panel admin-panel fade-in" id="admin_panel" style="margin-top: 16px;">
+      <h3>Admin Panel</h3>
+      <div id="admin_status" class="muted"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody id="admin_users"></tbody>
+      </table>
     </div>
   </div>
 
@@ -50,6 +185,10 @@
     const statusEl = document.getElementById('status');
     const player = document.getElementById('player');
     const authEl = document.getElementById('auth');
+    const loginLinkEl = document.getElementById('login_link');
+    const adminPanelEl = document.getElementById('admin_panel');
+    const adminStatusEl = document.getElementById('admin_status');
+    const adminUsersEl = document.getElementById('admin_users');
     let hls;
 
     function setStatus(text) {
@@ -58,6 +197,18 @@
 
     function setAuth(text) {
       authEl.textContent = text;
+    }
+
+    function setLoggedInUi(isLoggedIn) {
+      loginLinkEl.style.display = isLoggedIn ? 'none' : 'inline-block';
+    }
+
+    function setAdminPanelVisible(isVisible) {
+      adminPanelEl.style.display = isVisible ? 'block' : 'none';
+    }
+
+    function setAdminStatus(text) {
+      adminStatusEl.textContent = text;
     }
 
     function getToken() {
@@ -78,6 +229,7 @@
       const token = getToken();
       if (!token) {
         setStatus('Login requerido');
+        setLoggedInUi(false);
         return;
       }
       const res = await fetch(`${apiBase}/videos`, {
@@ -94,8 +246,18 @@
       }
       data.forEach(v => {
         const div = document.createElement('div');
-        div.className = 'video-item';
-        div.textContent = `${v.title} ${v.is_premium ? '(premium)' : ''}`;
+        div.className = 'video-card';
+        const img = document.createElement('img');
+        img.src = v.thumbnail_url || 'https://via.placeholder.com/200x120?text=No+Thumbnail';
+        img.alt = v.title;
+        const title = document.createElement('div');
+        title.className = 'title';
+        title.textContent = v.title;
+        if (v.is_premium) {
+          title.textContent += ' (premium)';
+        }
+        div.appendChild(img);
+        div.appendChild(title);
         div.onclick = () => playVideo(v.id, token);
         videosEl.appendChild(div);
       });
@@ -127,27 +289,70 @@
       setStatus('Playing');
     }
 
-    async function login() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      if (!email || !password) {
-        setAuth('Email y password requeridos');
-        return;
-      }
-      setAuth('Logging in...');
-      const res = await fetch(`${apiBase}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+    async function loadAdminUsers(token) {
+      setAdminStatus('Loading users...');
+      const res = await fetch(`${apiBase}/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) {
-        setAuth(`Login error: ${res.status}`);
+        setAdminStatus(`Error: ${res.status}`);
         return;
       }
-      const data = await res.json();
-      setToken(data.access_token);
-      setAuth(`Logged in as ${data.user.email} (${data.user.role})`);
-      await loadVideos();
+      const users = await res.json();
+      adminUsersEl.innerHTML = '';
+      users.forEach(u => {
+        const row = document.createElement('tr');
+
+        const emailCell = document.createElement('td');
+        emailCell.textContent = u.email;
+
+        const roleCell = document.createElement('td');
+        const roleTag = document.createElement('span');
+        roleTag.className = 'role-tag';
+        roleTag.textContent = u.role;
+        roleCell.appendChild(roleTag);
+
+        const changeCell = document.createElement('td');
+        const select = document.createElement('select');
+        ['USER', 'PREMIUM', 'ADMIN'].forEach(role => {
+          const opt = document.createElement('option');
+          opt.value = role;
+          opt.textContent = role;
+          if (role === u.role) opt.selected = true;
+          select.appendChild(opt);
+        });
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = 'Save';
+        saveBtn.onclick = async () => {
+          setAdminStatus('Updating role...');
+          const updateRes = await fetch(`${apiBase}/admin/users/${u.id}/role`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ role: select.value })
+          });
+          if (!updateRes.ok) {
+            setAdminStatus(`Update error: ${updateRes.status}`);
+            return;
+          }
+          setAdminStatus('Role updated');
+          await loadAdminUsers(token);
+        };
+        changeCell.appendChild(select);
+        changeCell.appendChild(saveBtn);
+
+        row.appendChild(emailCell);
+        row.appendChild(roleCell);
+        row.appendChild(changeCell);
+        adminUsersEl.appendChild(row);
+      });
+      if (!users.length) {
+        setAdminStatus('No users');
+      } else {
+        setAdminStatus('');
+      }
     }
 
     function logout() {
@@ -155,6 +360,10 @@
       videosEl.innerHTML = '';
       setStatus('');
       setAuth('Logged out');
+      setLoggedInUi(false);
+      setAdminPanelVisible(false);
+      adminUsersEl.innerHTML = '';
+      setAdminStatus('');
       if (hls) {
         hls.destroy();
         hls = null;
@@ -167,6 +376,8 @@
       const token = getToken();
       if (!token) {
         setAuth('Not logged in');
+        setLoggedInUi(false);
+        setAdminPanelVisible(false);
         return;
       }
       const res = await fetch(`${apiBase}/auth/me`, {
@@ -175,14 +386,22 @@
       if (!res.ok) {
         clearToken();
         setAuth('Session expired');
+        setLoggedInUi(false);
+        setAdminPanelVisible(false);
         return;
       }
       const me = await res.json();
       setAuth(`Logged in as ${me.email} (${me.role})`);
+      setLoggedInUi(true);
       await loadVideos();
+      if (me.role === 'ADMIN') {
+        setAdminPanelVisible(true);
+        await loadAdminUsers(token);
+      } else {
+        setAdminPanelVisible(false);
+      }
     }
 
-    document.getElementById('login').addEventListener('click', login);
     document.getElementById('logout').addEventListener('click', logout);
     initAuth();
   </script>

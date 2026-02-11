@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Horios OTT Login</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=DM+Sans:wght@400;600&display=swap');
+    :root {
+      --bg: #0b0f1a;
+      --panel: #131826;
+      --text: #e6edf6;
+      --muted: #9aa6b2;
+      --line: #242b3a;
+      --accent-1: #7aa8ff;
+      --accent-2: #9a86ff;
+      --accent-3: #65d1c8;
+      --shadow-sm: 0 10px 26px rgba(8, 10, 16, 0.55);
+      --shadow-md: 0 18px 40px rgba(8, 10, 16, 0.6);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Manrope", "DM Sans", sans-serif;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(700px 320px at 10% -10%, rgba(122, 168, 255, 0.18), transparent 60%),
+        radial-gradient(620px 260px at 90% -10%, rgba(154, 134, 255, 0.14), transparent 60%),
+        radial-gradient(520px 220px at 50% 120%, rgba(101, 209, 200, 0.12), transparent 60%),
+        var(--bg);
+      min-height: 100vh;
+      padding: 32px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      padding: 18px;
+      border-radius: 16px;
+      background: var(--panel);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-md);
+    }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .muted { color: var(--muted); font-size: 12px; }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      background: #0f1422;
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 12px;
+    }
+    button {
+      margin-top: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      border: none;
+      border-radius: 999px;
+      color: #0b0f1a;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 12px 20px rgba(122, 168, 255, 0.35);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(19, 24, 38, 0.75);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(6px);
+    }
+    .topbar a { text-decoration: none; color: var(--text); opacity: 0.7; }
+    .topbar a:hover { opacity: 1; }
+    h2 {
+      margin: 0;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 0.4px;
+    }
+    .fade-in { animation: fadeUp 0.6s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar fade-in">
+    <h2>Horios OTT Login</h2>
+    <a href="/">Go to catalog</a>
+  </div>
+
+  <div class="row">
+    <div class="panel fade-in" style="flex: 1 1 320px;">
+      <div><strong>Login</strong></div>
+      <label for="email">Email</label>
+      <input id="email" placeholder="user@example.com" />
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="password123" />
+      <button id="login">Login</button>
+      <div id="auth" class="muted"></div>
+    </div>
+
+    <div class="panel fade-in" style="flex: 1 1 320px;">
+      <div><strong>Register</strong></div>
+      <label for="email_reg">Email</label>
+      <input id="email_reg" placeholder="newuser@example.com" />
+      <label for="password_reg">Password</label>
+      <input id="password_reg" type="password" placeholder="password123" />
+      <label for="role_reg">Role</label>
+      <select id="role_reg">
+        <option value="USER">Normal</option>
+        <option value="PREMIUM">Premium</option>
+      </select>
+      <button id="register">Register</button>
+      <div id="reg_status" class="muted"></div>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = window.location.origin;
+    const authEl = document.getElementById('auth');
+    const regStatusEl = document.getElementById('reg_status');
+
+    function setAuth(text) {
+      authEl.textContent = text;
+    }
+
+    function setRegStatus(text) {
+      regStatusEl.textContent = text;
+    }
+
+    function setToken(token) {
+      localStorage.setItem('token', token);
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      if (!email || !password) {
+        setAuth('Email y password requeridos');
+        return;
+      }
+      setAuth('Logging in...');
+      const res = await fetch(`${apiBase}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (!res.ok) {
+        setAuth(`Login error: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      setToken(data.access_token);
+      setAuth(`Logged in as ${data.user.email} (${data.user.role})`);
+      window.location.href = '/';
+    }
+
+    async function register() {
+      const email = document.getElementById('email_reg').value.trim();
+      const password = document.getElementById('password_reg').value.trim();
+      const role = document.getElementById('role_reg').value;
+      if (!email || !password) {
+        setRegStatus('Email y password requeridos');
+        return;
+      }
+      setRegStatus('Registering...');
+      const res = await fetch(`${apiBase}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, role })
+      });
+      if (!res.ok) {
+        setRegStatus(`Register error: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      setToken(data.access_token);
+      setRegStatus(`Registered and logged in as ${data.user.email} (${data.user.role})`);
+      window.location.href = '/';
+    }
+
+    document.getElementById('login').addEventListener('click', login);
+    document.getElementById('register').addEventListener('click', register);
+  </script>
+</body>
+</html>

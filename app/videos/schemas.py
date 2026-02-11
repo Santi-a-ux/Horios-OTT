@@ -19,6 +19,7 @@ class VideoResponse(BaseModel):
     is_hidden: bool
     mux_asset_id: str | None
     playback_id: str | None
+    thumbnail_url: str | None
     status: VideoStatus
     created_by: int
     created_at: datetime

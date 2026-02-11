@@ -6,6 +6,7 @@ from app.db.models import UserRole
 class RegisterRequest(BaseModel):
     email: str
     password: str
+    role: UserRole = UserRole.USER
 
     @field_validator("password")
     @classmethod

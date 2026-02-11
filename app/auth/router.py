@@ -11,10 +11,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=AuthResponse, status_code=201)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
-    if len(payload.password.encode("utf-8")) > 72:
+    if payload.role == UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be 72 bytes or fewer",
+            detail="Cannot register as admin",
         )
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
@@ -26,7 +26,7 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     user = User(
         email=payload.email,
         password_hash=hash_password(payload.password),
-        role=UserRole.USER,
+        role=payload.role,
     )
     db.add(user)
     db.commit()
@@ -50,7 +50,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            detail="Invalid credentials",
         )
 
     token = create_access_token(subject=str(user.id), role=user.role.value)
