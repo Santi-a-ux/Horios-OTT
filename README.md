@@ -20,19 +20,19 @@ cp .env.example .env
 ### 4.
 ```bash
 # Database - Supabase (pooler)
-DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require
+DATABASE_URL=postgresql://postgres.whjovldnkmxkmtsrncop:I7KJlgIGvTYviZIY@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require
 
-# JWT - Genera una secret segura en produccion
+# JWT - Genera una secret segura en producción
 JWT_SECRET=your-super-secret-key-min-32-chars-here-change-me
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=360
 
 # Mux - Credentials
-MUX_TOKEN_ID=your-mux-token-id
-MUX_TOKEN_SECRET=your-mux-token-secret
-
+MUX_TOKEN_ID=dbe54439-74e3-467e-9d4f-9516339196b6
+MUX_TOKEN_SECRET=vHRqy+HV9fq3tMI0ZpIGPZCOKdAXC0B6GLweJttevLuCDgwMN5pOLW5h8N32uUaIdPlgoyH1wre
 # API
 API_BASE_URL=http://localhost:8000
+
 ```
 
 ### 5. Correr servidor
