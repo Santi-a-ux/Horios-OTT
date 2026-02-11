@@ -22,10 +22,14 @@
 <body>
   <h2>Horios OTT Demo</h2>
   <div class="panel">
-    <label for="token">Token (Bearer)</label>
-    <input id="token" placeholder="eyJhbGciOi..." />
-    <button id="load">Load videos</button>
-    <div class="muted">Tip: pega solo el token, sin la palabra "Bearer".</div>
+    <div><strong>Login</strong></div>
+    <label for="email">Email</label>
+    <input id="email" placeholder="user@example.com" />
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="password123" />
+    <button id="login">Login</button>
+    <button id="logout">Logout</button>
+    <div id="auth" class="muted"></div>
   </div>
 
   <div class="row" style="margin-top: 16px;">
@@ -45,18 +49,35 @@
     const videosEl = document.getElementById('videos');
     const statusEl = document.getElementById('status');
     const player = document.getElementById('player');
+    const authEl = document.getElementById('auth');
     let hls;
 
     function setStatus(text) {
       statusEl.textContent = text;
     }
 
+    function setAuth(text) {
+      authEl.textContent = text;
+    }
+
+    function getToken() {
+      return localStorage.getItem('token') || '';
+    }
+
+    function setToken(token) {
+      localStorage.setItem('token', token);
+    }
+
+    function clearToken() {
+      localStorage.removeItem('token');
+    }
+
     async function loadVideos() {
       videosEl.innerHTML = '';
       setStatus('');
-      const token = document.getElementById('token').value.trim();
+      const token = getToken();
       if (!token) {
-        setStatus('Token requerido');
+        setStatus('Login requerido');
         return;
       }
       const res = await fetch(`${apiBase}/videos`, {
@@ -106,7 +127,64 @@
       setStatus('Playing');
     }
 
-    document.getElementById('load').addEventListener('click', loadVideos);
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      if (!email || !password) {
+        setAuth('Email y password requeridos');
+        return;
+      }
+      setAuth('Logging in...');
+      const res = await fetch(`${apiBase}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      if (!res.ok) {
+        setAuth(`Login error: ${res.status}`);
+        return;
+      }
+      const data = await res.json();
+      setToken(data.access_token);
+      setAuth(`Logged in as ${data.user.email} (${data.user.role})`);
+      await loadVideos();
+    }
+
+    function logout() {
+      clearToken();
+      videosEl.innerHTML = '';
+      setStatus('');
+      setAuth('Logged out');
+      if (hls) {
+        hls.destroy();
+        hls = null;
+      }
+      player.removeAttribute('src');
+      player.load();
+    }
+
+    async function initAuth() {
+      const token = getToken();
+      if (!token) {
+        setAuth('Not logged in');
+        return;
+      }
+      const res = await fetch(`${apiBase}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        clearToken();
+        setAuth('Session expired');
+        return;
+      }
+      const me = await res.json();
+      setAuth(`Logged in as ${me.email} (${me.role})`);
+      await loadVideos();
+    }
+
+    document.getElementById('login').addEventListener('click', login);
+    document.getElementById('logout').addEventListener('click', logout);
+    initAuth();
   </script>
 </body>
 </html>

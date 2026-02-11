@@ -14,22 +14,22 @@ source .venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
-### 3. 
+### 3.
 cp .env.example .env
 
 ### 4.
 ```bash
 # Database - Supabase (pooler)
-DATABASE_URL=postgresql://postgres.whjovldnkmxkmtsrncop:I7KJlgIGvTYviZIY@aws-0-us-west-2.pooler.supabase.com:5432/postgres
+DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require
 
-# JWT - Genera una secret segura en producción
+# JWT - Genera una secret segura en produccion
 JWT_SECRET=your-super-secret-key-min-32-chars-here-change-me
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=360
 
 # Mux - Credentials
-MUX_TOKEN_ID=1bcd0f5a-78a2-4944-90e3-d6a8a70fbd38
-MUX_TOKEN_SECRET=tuPowCfY1RbmqfFSq/loFXGR7a7fire+IKNyiVP2T+rrNMjowVFpf/4nh4qDQuS/nNdTjmA/1oH
+MUX_TOKEN_ID=your-mux-token-id
+MUX_TOKEN_SECRET=your-mux-token-secret
 
 # API
 API_BASE_URL=http://localhost:8000

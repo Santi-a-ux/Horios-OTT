@@ -19,7 +19,8 @@ class MuxService:
             auth=self.auth,
             timeout=30,
         )
-        response.raise_for_status()
+        if not response.ok:
+            raise RuntimeError(f"Mux error {response.status_code}: {response.text}")
         data = response.json()["data"]
         mux_asset_id = data["id"]
         playback_id = data["playback_ids"][0]["id"]

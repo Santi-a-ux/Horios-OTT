@@ -37,6 +37,7 @@ class Video(Base):
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
     is_premium = Column(Boolean, default=False, nullable=False)
+    is_hidden = Column(Boolean, default=False, nullable=False)
     mux_asset_id = Column(String, nullable=True, index=True)
     playback_id = Column(String, nullable=True, index=True)
     status = Column(String, default=VideoStatus.PROCESSING.value, nullable=False)

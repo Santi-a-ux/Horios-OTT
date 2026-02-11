@@ -28,6 +28,7 @@ def create_video(
         title=payload.title,
         description=payload.description,
         is_premium=payload.is_premium,
+        is_hidden=payload.is_hidden,
         mux_asset_id=mux_asset_id,
         playback_id=playback_id,
         status=VideoStatus.PROCESSING.value,
@@ -42,6 +43,7 @@ def create_video(
         title=video.title,
         description=video.description,
         is_premium=video.is_premium,
+        is_hidden=video.is_hidden,
         mux_asset_id=video.mux_asset_id,
         playback_id=video.playback_id,
         status=video.status,
@@ -57,7 +59,12 @@ def list_videos(
 ):
     query = db.query(Video)
     if current_user.role == UserRole.USER:
-        query = query.filter(Video.is_premium.is_(False))
+        query = query.filter(
+            Video.is_premium.is_(False),
+            Video.is_hidden.is_(False),
+        )
+    elif current_user.role == UserRole.PREMIUM:
+        query = query.filter(Video.is_hidden.is_(False))
     videos = query.order_by(Video.created_at.desc()).all()
 
     return [
@@ -66,6 +73,7 @@ def list_videos(
             title=v.title,
             description=v.description,
             is_premium=v.is_premium,
+            is_hidden=v.is_hidden,
             mux_asset_id=v.mux_asset_id,
             playback_id=v.playback_id,
             status=v.status,
@@ -86,6 +94,9 @@ def get_video(
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
 
+    if video.is_hidden and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=404, detail="Video not found")
+
     if video.is_premium and current_user.role == UserRole.USER:
         raise HTTPException(status_code=403, detail="Premium content")
 
@@ -94,6 +105,7 @@ def get_video(
         title=video.title,
         description=video.description,
         is_premium=video.is_premium,
+        is_hidden=video.is_hidden,
         mux_asset_id=video.mux_asset_id,
         playback_id=video.playback_id,
         status=video.status,
@@ -125,6 +137,9 @@ def play_video(
 
     if video.status != VideoStatus.READY.value:
         return PlayResponse(status=video.status, playback_url=None)
+
+    if video.is_hidden and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=404, detail="Video not found")
 
     if video.is_premium and current_user.role == UserRole.USER:
         raise HTTPException(status_code=403, detail="Premium content")

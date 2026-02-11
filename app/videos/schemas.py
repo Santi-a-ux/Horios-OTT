@@ -7,6 +7,7 @@ class VideoCreateRequest(BaseModel):
     title: str
     description: str | None = None
     is_premium: bool = False
+    is_hidden: bool = False
     input_url: str
 
 
@@ -15,6 +16,7 @@ class VideoResponse(BaseModel):
     title: str
     description: str | None
     is_premium: bool
+    is_hidden: bool
     mux_asset_id: str | None
     playback_id: str | None
     status: VideoStatus
