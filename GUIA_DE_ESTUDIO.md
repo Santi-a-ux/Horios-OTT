@@ -905,6 +905,101 @@ Permite ocultar videos (solo visible para ADMIN).
 
 Incluye requests de ejemplo para todos los endpoints.
 
+### Scripts de Utilidad: scripts/
+
+#### **seed_users.py**
+**Propósito:** Crea usuarios de prueba en la base de datos
+
+**Funcionalidad:**
+- Crea usuarios de ejemplo para desarrollo y testing
+- Usuarios por defecto:
+  - `admin@example.com` (ADMIN) - contraseña: admin123
+  - `pepito@example.com` (USER) - contraseña: password123
+  - `juancito.premium@example.com` (PREMIUM) - contraseña: password123
+- Si el usuario ya existe, actualiza su rol y contraseña
+
+**Uso:**
+```bash
+python scripts/seed_users.py
+# Con contraseña personalizada:
+python scripts/seed_users.py --password mipassword
+```
+
+#### **seed_videos.py**
+**Propósito:** Crea videos de ejemplo usando videos públicos de demostración
+
+**Funcionalidad:**
+- Usa videos de ejemplo de Google (Big Buck Bunny, Sintel, etc.)
+- Crea 10 videos de muestra con diferentes configuraciones:
+  - Algunos gratuitos, otros premium
+  - Algunos ocultos (solo para admin)
+- Llama a Mux API para procesar cada video
+- Si el video ya existe, actualiza sus propiedades
+
+**Uso:**
+```bash
+python scripts/seed_videos.py
+# Especificar usuario creador:
+python scripts/seed_videos.py --created-by 1
+```
+
+**Nota:** El plan gratuito de Mux tiene límites, por eso se limita a 10 videos.
+
+#### **mux_check.py**
+**Propósito:** Verifica la conexión con Mux y lista los assets existentes
+
+**Funcionalidad:**
+- Consulta la API de Mux para listar todos los assets
+- Muestra el estado de procesamiento de cada asset
+- Útil para debugging y verificar que las credenciales de Mux funcionan
+
+**Uso:**
+```bash
+python scripts/mux_check.py
+```
+
+**Salida de ejemplo:**
+```
+Mux assets count: 10
+- abc123 | ready | playback_id=xyz789
+- def456 | processing | playback_id=uvw012
+...
+```
+
+#### **clear_videos.py**
+**Propósito:** Elimina todos los videos de la base de datos
+
+**Funcionalidad:**
+- Borra todos los registros de la tabla `videos`
+- Útil para limpiar la base de datos durante desarrollo
+- **Nota:** No elimina los assets de Mux, solo los registros locales
+
+**Uso:**
+```bash
+python scripts/clear_videos.py
+```
+
+**⚠️ Advertencia:** Este script elimina datos permanentemente. Usar con precaución.
+
+### Flujo de Trabajo Típico con Scripts
+
+Para configurar un entorno de desarrollo completo:
+
+```bash
+# 1. Crear usuarios de prueba
+python scripts/seed_users.py
+
+# 2. Crear videos de ejemplo
+python scripts/seed_videos.py --created-by 1
+
+# 3. Verificar que Mux procesó los videos
+python scripts/mux_check.py
+
+# 4. Si necesitas limpiar y empezar de nuevo
+python scripts/clear_videos.py
+python scripts/seed_videos.py --created-by 1
+```
+
 ---
 
 ## 🔄 Flujo de Datos Detallado
