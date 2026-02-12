@@ -2,6 +2,21 @@
 
 OTT (Over-The-Top) streaming platform con FastAPI, PostgreSQL y Mux.
 
+## 📚 Documentación Completa
+
+Para una guía de estudio detallada del proyecto, incluyendo explicaciones de todas las tecnologías, arquitectura, y el propósito de cada archivo, consulta:
+
+**[GUIA_DE_ESTUDIO.md](GUIA_DE_ESTUDIO.md)** - Guía completa en español que cubre:
+- Todas las tecnologías utilizadas y por qué
+- Estructura completa del proyecto
+- Explicación detallada de la integración con Mux
+- Conexión con la base de datos PostgreSQL
+- Arquitectura y flujos de datos
+- Descripción de cada archivo y módulo
+- Casos de uso y ejemplos prácticos
+
+---
+
 ## Setup Rápido
 
 ### 1. Variables de entorno
